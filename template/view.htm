@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="{{root}}/css/main.css" />
+	<script type="text/javascript" src="{{root}}/js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="{{root}}/js/app.js"></script>
+	<title>unitaskpapera - {{page}}</title>
+</head>
+<body>
+	<div id="header">
+		<h1>unitaskpapera</h1>
+		<p data-keep-if="owner"><a href="{{root}}/edit/{{page}}" class="edit">edit</a></p>
+		<p data-remove-if="isIndex"><a href="{{root}}" class="back">back to index</a></p>
+		<div class="clearer">&nbsp;</div>
+	</div>
+
+	<div id="container">
+		<h2>{{page}}</h2>
+		<p id="search_form">
+			<input type="text" id="search" value="" />
+			<a href="javascript:void(0);" id="clear">clear</a>
+		</p>
+		<div class="clearer">&nbsp;</div>
+	
+		<ul id="items">
+		<li data-list="items">
+			<input type="checkbox" id="item_{{items[].key}}" checked="checked" data-keep-if="items[].value.done" />
+			<input type="checkbox" id="item_{{items[].key}}" data-remove-if="items[].value.done" />
+			
+			<label for="item_{{items[].key}}" id="label_{{items[].key}}" class="done" data-keep-if="items[].value.done">{{items[].value.caption}}</label>
+			<label for="item_{{items[].key}}" id="label_{{items[].key}}" data-remove-if="items[].value.done">{{items[].value.caption}}</label>
+	
+			<span class="tag t{{items[].key}}" data-list="items[].value.tags">
+				{{items[].value.tags[]}}
+			</span>
+		</li>
+		</ul>
+	
+		<input type="hidden" id="address" value="{{root}}" />
+		<input type="hidden" id="page" value="{{page}}" />
+		<input type="hidden" id="owner" value="true" data-keep-if="owner" />
+	
+		<p data-remove-if="isIndex"><a href="{{root}}" class="back">back to index</a></p>
+	</div>
+
+	<div id="footer">
+		<p>&copy; 2009 masashi iizuka</p>
+	</div>
+</body>
+</html>
+

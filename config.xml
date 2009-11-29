@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget network="public">
+	<widgetname>unitaskpapera</widgetname>
+	<description>Task Paper Clone for Opera Unite</description>
+
+	<feature name="http://xmlns.opera.com/webserver">
+		<param name="type" value="service"/>
+		<param name="servicepath" value="unitask"/>
+	</feature>
+
+	<feature name="http://xmlns.opera.com/fileio" />
+
+	<author>
+		<name>Masashi Iizuka</name>
+		<link>http://twitter.com/uochan</link>
+		<organization /><email />
+	</author>
+</widget>
+
