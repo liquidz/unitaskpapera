@@ -12,32 +12,62 @@ taskpaper.parseLine = function(line){
 	var text = mouf.trim(line);
 	var tags = null;
 	var done = false;
-	var index = text.indexOf("#");
-	if(index !== -1){
-		tags = mouf.trim(text.substr(index)).split(/\s+/)
-		text = text.substr(0, index);
-		if(tags){
-			mouf.each(tags, function(){
-				if(this.indexOf("#done") !== -1){
-					done = true;
-					return true;
-				}
-			});
+
+	if(text.indexOf(":") === text.length - 1){
+		return {
+			isTask: false,
+			caption: text
+		};
+	} else {
+		var index = text.indexOf("#");
+		if(index !== -1){
+			tags = mouf.trim(text.substr(index)).split(/\s+/)
+			text = text.substr(0, index);
+			if(tags){
+				mouf.each(tags, function(){
+					if(this.indexOf("#done") !== -1){
+						done = true;
+						return true;
+					}
+				});
+			}
 		}
+		return {
+			isTask: true,
+			caption: text,
+			done: done,
+			tags: tags
+		};
 	}
-	return {
-		caption: text,
-		done: done,
-		tags: tags
-	};
 };
 
 taskpaper.parse = function(str){
+	var group = {
+		name: "default",
+		tasks: {}
+	};
 	var res = {};
-	var count = 0;
+	var count = {
+		group: 0,
+		task: 0
+	};
+
 	mouf.each(str.split(/[\r\n]+/), function(){
-		res[count] = taskpaper.parseLine(this);
-		++count;
+		var parsedItem = taskpaper.parseLine(this);
+
+		if(parsedItem.isTask){
+			// task
+			group.tasks[count.task++] = parsedItem;
+		} else {
+			// group
+			res[count.group++] = group;
+			group.name = parsedItem.caption;
+			group.tasks = {};
+			count.task = 0;
+		}
+		//res[count] = taskpaper.parseLine(this);
+		//++count;
+		res[count.group] = group;
 	});
 	return res;
 };
