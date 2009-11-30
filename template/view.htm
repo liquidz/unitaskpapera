@@ -22,7 +22,28 @@
 			<a href="javascript:void(0);" id="clear">clear</a>
 		</p>
 		<div class="clearer">&nbsp;</div>
+
+		<dl data-list="items">
+			<dt id="group_{{items[].key}}" class="group">{{items[].value.name}}</dt>
+			<dd id="group_body_{{items[].key}}">
+				<ul class="items">
+				<li data-list="items[].value.tasks">
+					<input type="checkbox" id="item_{{items[].value.tasks[].key}}" checked="checked" data-keep-if="items[].value.tasks[].value.done" />
+					<input type="checkbox" id="item_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done" />
+					
+					<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" class="done" data-keep-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
+					<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
+			
+					<span class="tag t{{items[].value.tasks[].key}}" data-list="items[].value.tasks[].value.tags">
+						{{items[].value.tasks[].value.tags[]}}
+					</span>
+
+				</li>
+				</ul>
+			</dd>
+		</dl>
 	
+	<!--
 		<ul id="items">
 		<li data-list="items">
 			<input type="checkbox" id="item_{{items[].key}}" checked="checked" data-keep-if="items[].value.done" />
@@ -36,6 +57,7 @@
 			</span>
 		</li>
 		</ul>
+		-->
 	
 		<input type="hidden" id="address" value="{{root}}" />
 		<input type="hidden" id="page" value="{{page}}" />

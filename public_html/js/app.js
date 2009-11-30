@@ -54,9 +54,9 @@ jQuery(function(){
 
 	$("input#search").bind("keyup", tpApp.searchEvent);
 	if(owner && owner.val() === "true"){
-		$("ul#items li input").bind("click", tpApp.toggleDoneEvent);
+		$("ul.items li input").bind("click", tpApp.toggleDoneEvent);
 	} else {
-		$("ul#items li input").attr("disabled", "true");
+		$("ul.items li input").attr("disabled", "true");
 	}
 
 	$("span.tag").bind("click", function(e){
@@ -68,4 +68,10 @@ jQuery(function(){
 		$("input#search").val("");
 		tpApp.search("");
 	});
+
+	$("dl dt.group").bind("click", function(e){
+		var id = e.target.id.split("_")[1];
+		$("dl dd#group_body_" + id).toggle();
+	});
+	$("dl dd").hide();
 });

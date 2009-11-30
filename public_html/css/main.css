@@ -1,4 +1,4 @@
-body, h1, h2, ul, p {
+body, h1, h2, ul, p, dl, dl dt, dl dd {
 	margin: 0;
 	padding: 0;
 }
@@ -78,17 +78,33 @@ div.clearer {
 	width: 10em;
 }
 
-#container ul#items {
-	list-style: none;
+#container dl {
 	margin-top: 10px;
 }
+#container dl dt {
+	font-weight: bold;
+	letter-spacing: 1px;
+	color: #777;
+	font-size: small;
+	cursor: pointer;
+}
+#container dl dd {
+	margin-left: 15px;
+}
 
-#container ul#items li label.done {
+#container ul.items {
+	list-style: none;
+	/*
+	margin-top: 10px;
+	*/
+}
+
+#container ul.items li label.done {
 	color: #aaa;
 	text-decoration: line-through;
 }
 
-#container ul#items li span.tag {
+#container ul.items li span.tag {
 	color: #f00;
 	cursor: pointer;
 }

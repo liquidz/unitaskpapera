@@ -81,6 +81,24 @@ mouf.trim = function(str){
 	return str.replace(/^\s+|\s+$/g, "");
 };
 
+// =clone
+// via http://blog.livedoor.jp/dankogai/archives/50957890.html
+mouf.clone = function(obj){
+	if(typeof obj !== "object"){
+		return null;
+	} else {
+		if(obj && obj.constructor){
+			var cloneObj = new (obj.constructor);
+			for(var p in obj){
+				cloneObj[p] = (typeof obj[p] === "object") ? this.clone(obj[p]) : obj[p];
+			}
+			return cloneObj;
+		} else {
+			return null;
+		}
+	}
+};
+
 // =debug
 mouf.debug = function(str){
 	opera.postError(str);

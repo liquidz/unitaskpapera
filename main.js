@@ -43,8 +43,9 @@ taskpaper.parseLine = function(line){
 
 taskpaper.parse = function(str){
 	var group = {
-		name: "default",
-		tasks: {}
+		name: "default:",
+		tasks: {},
+		hasTask: false
 	};
 	var res = {};
 	var count = {
@@ -58,17 +59,17 @@ taskpaper.parse = function(str){
 		if(parsedItem.isTask){
 			// task
 			group.tasks[count.task++] = parsedItem;
+			group.hasTask = true;
 		} else {
 			// group
-			res[count.group++] = group;
+			if(group.hasTask) res[count.group++] = mouf.clone(group);
+
 			group.name = parsedItem.caption;
 			group.tasks = {};
-			count.task = 0;
+			group.hasTask = false;
 		}
-		//res[count] = taskpaper.parseLine(this);
-		//++count;
-		res[count.group] = group;
 	});
+	res[count.group] = group;
 	return res;
 };
 
@@ -139,11 +140,6 @@ taskpaper.parse = function(str){
 				}
 			});
 			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
-			/*
-			if(newLine){
-				var taskpaper.parseLine(newLine)
-			}
-			*/
 			result = "success"
 		}
 		return result;
