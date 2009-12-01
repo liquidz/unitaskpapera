@@ -10,13 +10,17 @@
 <body>
 	<div id="header">
 		<h1>unitaskpapera</h1>
+		<!-- =edit link -->
 		<p data-keep-if="owner"><a href="{{root}}/edit/{{page}}" class="edit">edit</a></p>
+		<!-- =back link -->
 		<p data-remove-if="isIndex"><a href="{{root}}" class="back">back to index</a></p>
 		<div class="clearer">&nbsp;</div>
 	</div>
 
 	<div id="container">
+		<!-- =page title -->
 		<h2>{{page}}</h2>
+		<!-- =search form -->
 		<p id="search_form">
 			<input type="text" id="search" value="" />
 			<a href="javascript:void(0);" id="clear">clear</a>
@@ -24,40 +28,32 @@
 		<div class="clearer">&nbsp;</div>
 
 		<dl data-list="items">
+			<!-- =group title -->
 			<dt id="group_{{items[].key}}" class="group">{{items[].value.name}}</dt>
+			<!-- =group body -->
 			<dd id="group_body_{{items[].key}}">
 				<ul class="items">
 				<li data-list="items[].value.tasks">
+					<!-- =check box -->
 					<input type="checkbox" id="item_{{items[].value.tasks[].key}}" checked="checked" data-keep-if="items[].value.tasks[].value.done" />
 					<input type="checkbox" id="item_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done" />
 					
+					<!-- =task caption -->
 					<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" class="done" data-keep-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
 					<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
 			
+					<!-- =tags -->
 					<span class="tag t{{items[].value.tasks[].key}}" data-list="items[].value.tasks[].value.tags">
 						{{items[].value.tasks[].value.tags[]}}
 					</span>
+
+					<!-- =text -->
+					<p data-keep-if="items[].value.tasks[].value.text">{{items[].value.tasks[].value.text}}</p>
 
 				</li>
 				</ul>
 			</dd>
 		</dl>
-	
-	<!--
-		<ul id="items">
-		<li data-list="items">
-			<input type="checkbox" id="item_{{items[].key}}" checked="checked" data-keep-if="items[].value.done" />
-			<input type="checkbox" id="item_{{items[].key}}" data-remove-if="items[].value.done" />
-			
-			<label for="item_{{items[].key}}" id="label_{{items[].key}}" class="done" data-keep-if="items[].value.done">{{items[].value.caption}}</label>
-			<label for="item_{{items[].key}}" id="label_{{items[].key}}" data-remove-if="items[].value.done">{{items[].value.caption}}</label>
-	
-			<span class="tag t{{items[].key}}" data-list="items[].value.tags">
-				{{items[].value.tags[]}}
-			</span>
-		</li>
-		</ul>
-		-->
 	
 		<input type="hidden" id="address" value="{{root}}" />
 		<input type="hidden" id="page" value="{{page}}" />
