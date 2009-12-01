@@ -64,12 +64,6 @@ div.clearer {
 #container p#search_form {
 	float: left;
 	margin-left: 10px;
-	/*
-	margin: 5px 0;
-	padding: 3px 0;
-	border-top: 1px solid #aaa;
-	border-bottom: 1px solid #aaa;
-	*/
 }
 #container p#search_form input#search {
 	border: 1px solid #aaa;
@@ -94,9 +88,6 @@ div.clearer {
 
 #container ul.items {
 	list-style: none;
-	/*
-	margin-top: 10px;
-	*/
 }
 
 #container ul.items li label.done {
@@ -107,6 +98,14 @@ div.clearer {
 #container ul.items li span.tag {
 	color: #f00;
 	cursor: pointer;
+}
+
+#container ul.items li p.text {
+	color: #555;
+	text-indent: 2.5em;
+}
+#container dl dd ul.items li p.done {
+	color: #b0b0b0;
 }
 
 /* =footer */

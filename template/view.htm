@@ -48,7 +48,12 @@
 					</span>
 
 					<!-- =text -->
-					<p data-keep-if="items[].value.tasks[].value.text">{{items[].value.tasks[].value.text}}</p>
+					<p class="text done" data-keep-if="items[].value.tasks[].value.done" data-list="items[].value.tasks[].value.text">
+						{{items[].value.tasks[].value.text[]}}
+					</p>
+					<p class="text" data-remove-if="items[].value.tasks[].value.done" data-list="items[].value.tasks[].value.text">
+						{{items[].value.tasks[].value.text[]}}
+					</p>
 
 				</li>
 				</ul>

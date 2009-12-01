@@ -52,11 +52,6 @@ mouf.httpPost = function(url, postData, callback){
 mouf.getAddress = function(request){
 	var path = request.uri.split("/");
 	return (path.length > 1) ? "/" + path[1] : null;
-	/*
-	var index = path.length - 1;
-	if(path[index] === "") --index;
-	return "/" + path[index - 1];
-	*/
 };
 
 // =render
@@ -64,6 +59,8 @@ mouf.render = function(templateName, data){
 	var template = new Markuper(templateName, data);
 	return template.parse().html();
 };
+
+// ___ utility ___ {{{
 
 // =each
 mouf.each = function(arr, fn){
@@ -103,6 +100,8 @@ mouf.clone = function(obj){
 mouf.debug = function(str){
 	opera.postError(str);
 };
+
+// }}}
 
 // onload {{{
 (function(){

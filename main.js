@@ -7,13 +7,9 @@ taskpaper.constant = {
 	TYPE_GROUP: 1,
 	TYPE_TEXT: 2
 };
-//taskpaper.appName = "unitaskpapera";
-//taskpaper.defaultPage = "index";
 taskpaper.page = taskpaper.constant.DEFAULT_PAGE;
-//taskpaper.defaultContent = "- sample\n- done task #done";
 
 taskpaper.makeKeyName = function(){
-	//return this.appName + "_" + this.page;
 	return this.constant.APP_NAME + "_" + this.page;
 };
 
@@ -76,7 +72,6 @@ taskpaper.parse = function(str){
 	mouf.each(str.split(/[\r\n]+/), function(){
 		var parsedItem = taskpaper.parseLine(this);
 
-		//if(parsedItem.isTask){
 		if(parsedItem.type === taskpaper.constant.TYPE_TASK){
 			// task
 			group.tasks[count.task++] = parsedItem;
@@ -92,10 +87,9 @@ taskpaper.parse = function(str){
 			// text
 			var index = count.task - 1;
 			if(group.tasks[index].text){
-				group.tasks[index].text += parsedItem.caption;
+				group.tasks[index].text.push(parsedItem.caption);
 			} else {
-				//group.tasks[index].text = "<p>" + parsedItem.caption + "</p>";
-				group.tasks[index].text = parsedItem.caption;
+				group.tasks[index].text = [parsedItem.caption];
 			}
 		}
 	});
@@ -105,7 +99,6 @@ taskpaper.parse = function(str){
 
 (function(){
 	var getPageName = function(req){
-		//var pageName = taskpaper.defaultPage;
 		var pageName = taskpaper.constant.DEFAULT_PAGE;
 		var path = req.uri.split("/");
 		if(path.length > 3){
@@ -125,9 +118,7 @@ taskpaper.parse = function(str){
 		return mouf.render("template/view.htm", {
 			page: taskpaper.page,
 			owner: conn.isOwner,
-			//items: taskpaper.parse(mouf.get(taskpaper.makeKeyName(), taskpaper.defaultContent)),
 			items: taskpaper.parse(mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT)),
-			//isIndex: (taskpaper.page === taskpaper.defaultPage),
 			isIndex: (taskpaper.page === taskpaper.constant.DEFAULT_PAGE),
 			root: mouf.getAddress(req)
 		});
@@ -142,7 +133,6 @@ taskpaper.parse = function(str){
 			return mouf.render("template/edit.htm", {
 				page: taskpaper.page,
 				root: mouf.getAddress(req),
-				//data: mouf.get(taskpaper.makeKeyName(), taskpaper.defaultContent)
 				data: mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT)
 			});
 		} else {
@@ -158,7 +148,6 @@ taskpaper.parse = function(str){
 			var page = req.bodyItems.page[0];
 
 			taskpaper.page = page;
-			//var content = mouf.get(taskpaper.makeKeyName(), taskpaper.defaultContent);
 			var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
 			var newContent = [];
 			var newLine = null;
