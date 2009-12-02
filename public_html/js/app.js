@@ -19,7 +19,6 @@ tpApp.toggleDoneEvent = function(e){
 			if(checked === "true"){
 				label.addClass("done");
 				label.parent().append("<span class='tag t"+id+"'>#done</span>")
-				//$("span.t" + id)
 			} else {
 				label.removeClass("done");
 				$("span.t" + id).remove(":contains('done')");
@@ -49,6 +48,15 @@ tpApp.search = function(keyword){
 	}
 };
 
+tpApp.toggleGroup = function(e){
+	var id = e.target.id.split("_")[1];
+	var elem = $("dl dd#group_body_" + id);
+
+	elem.toggle(200, function(){
+		//elem.css
+	});
+};
+
 jQuery(function(){
 	var owner = $("#owner");
 
@@ -73,5 +81,5 @@ jQuery(function(){
 		var id = e.target.id.split("_")[1];
 		$("dl dd#group_body_" + id).toggle();
 	});
-	$("dl dd").hide();
+	$("dl dd.closed").hide();
 });

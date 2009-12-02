@@ -19,10 +19,18 @@ taskpaper.parseLine = function(line){
 	var done = false;
 
 	if(text.indexOf(":") === text.length - 1){
-		// group
+		// opened group
 		return {
 			type: this.constant.TYPE_GROUP,
-			caption: text
+			caption: text,
+			opened: true
+		};
+	} else if(text.indexOf(";") === text.length - 1){
+		// closed group
+		return {
+			type: this.constant.TYPE_GROUP,
+			caption: text,
+			opened: false
 		};
 	} else {
 		if(text.indexOf("-") === 0){

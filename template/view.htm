@@ -31,7 +31,8 @@
 			<!-- =group title -->
 			<dt id="group_{{items[].key}}" class="group">{{items[].value.name}}</dt>
 			<!-- =group body -->
-			<dd id="group_body_{{items[].key}}">
+			<dd id="group_body_{{items[].key}}" data-keep-if="items[].value.opened">
+			<dd id="group_body_{{items[].key}}" class="closed" data-remove-if="items[].value.opened">
 				<ul class="items">
 				<li data-list="items[].value.tasks">
 					<!-- =check box -->
