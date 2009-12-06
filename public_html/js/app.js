@@ -1,19 +1,20 @@
 var tpApp = {};
 
+tpApp.constant = {
+	LINK_MAX_LENGTH: 40
+};
+
 tpApp.toggleDoneEvent = function(e){
 	var address = $("#address").val();
 	var page = $("#page").val();
 	var id = e.target.id.split("_")[1];
 	var checked = (e.target.checked) ? "true" : "false";
 
-	opera.postError("toggle: " + address + "/update");
-
-	$.post(address + "/update", {
+	$.post(address + "/toggle_task", {
 		page: page,
 		id: id,
 		checked: checked
 	}, function(res){
-		opera.postError("res = " + res);
 		if(res === "success"){
 			var label = $("label#label_" + id);
 			if(checked === "true"){
@@ -24,7 +25,7 @@ tpApp.toggleDoneEvent = function(e){
 				$("span.t" + id).remove(":contains('done')");
 			}
 		} else {
-			e.target.checked = (checked === "true") ? false : true;
+			e.target.checked = !checked;
 		}
 	});
 };
@@ -39,7 +40,7 @@ tpApp.search = function(keyword){
 		lis.show();
 	} else {
 		lis.hide();
-		jQuery.each(lis, function(){
+		$.each(lis, function(){
 			var elem = $(this);
 			if(elem.html().replace(/<\/?[^>]+>/gi, "").indexOf(keyword) !== -1){
 				elem.show();
@@ -52,9 +53,37 @@ tpApp.toggleGroup = function(e){
 	var id = e.target.id.split("_")[1];
 	var elem = $("dl dd#group_body_" + id);
 
-	elem.toggle(200, function(){
-		//elem.css
+	var address = $("#address").val();
+	var page = $("#page").val();
+	var opened = (elem.attr("class").indexOf("closed") === -1) ? "true" : "false";
+
+	$.post(address + "/toggle_group", {
+		page: page,
+		id: id,
+		opened: opened
+	}, function(res){
+		if(res === "success"){
+			var title = $(e.target);
+
+			if(opened === "true"){
+				title.text(title.text().replace(/:\s*$/, ";"));
+			} else {
+				title.text(title.text().replace(/;\s*$/, ":"));
+			}
+			// dt class
+			$(e.target).toggleClass("closed");
+			// dd class
+			elem.toggleClass("closed");
+			elem.toggle();
+		}
 	});
+};
+
+tpApp.makeURLtoLink = function(){
+	var elem = $(this);
+	if(elem.text().indexOf("http") !== -1){
+		elem.html(elem.html().replace(/(https?:\/\/[\x21-\x7e]+)/, "<a href='$1' target='_blank' class='link'>$1</a>"));
+	}
 };
 
 jQuery(function(){
@@ -62,7 +91,11 @@ jQuery(function(){
 
 	$("input#search").bind("keyup", tpApp.searchEvent);
 	if(owner && owner.val() === "true"){
+		// task
 		$("ul.items li input").bind("click", tpApp.toggleDoneEvent);
+		// group
+		$("dl dt.group").bind("click", tpApp.toggleGroup);
+		$("dl dd.closed").hide();
 	} else {
 		$("ul.items li input").attr("disabled", "true");
 	}
@@ -77,9 +110,13 @@ jQuery(function(){
 		tpApp.search("");
 	});
 
-	$("dl dt.group").bind("click", function(e){
-		var id = e.target.id.split("_")[1];
-		$("dl dd#group_body_" + id).toggle();
+	$.each($("ul li label"), tpApp.makeURLtoLink);
+	$.each($("ul li p"), tpApp.makeURLtoLink);
+
+	$.each($("a.link"), function(){
+		var elem = $(this);
+		if(elem.text().length > tpApp.constant.LINK_MAX_LENGTH){
+			elem.text(elem.text().substr(0, tpApp.constant.LINK_MAX_LENGTH) + "...");
+		}
 	});
-	$("dl dd.closed").hide();
 });

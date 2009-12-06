@@ -76,11 +76,17 @@ div.clearer {
 	margin-top: 10px;
 }
 #container dl dt {
+	background: transparent url(../img/close.png) no-repeat left 50%;
+	padding-left: 15px;
+
 	font-weight: bold;
 	letter-spacing: 1px;
 	color: #777;
 	font-size: small;
 	cursor: pointer;
+}
+#container dl dt.closed {
+	background: transparent url(../img/open.png) no-repeat left 50%;
 }
 #container dl dd {
 	margin-left: 15px;
@@ -106,6 +112,10 @@ div.clearer {
 }
 #container dl dd ul.items li p.done {
 	color: #b0b0b0;
+}
+
+#container dl dd ul li a.link {
+	font-size: small;
 }
 
 /* =footer */

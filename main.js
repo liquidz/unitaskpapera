@@ -2,7 +2,7 @@ var taskpaper = {};
 taskpaper.constant = {
 	APP_NAME: "unitaskpapera",
 	DEFAULT_PAGE: "index",
-	DEFAULT_CONTENT: "- sample\n- done task #done",
+	DEFAULT_CONTENT: "group:\n- sample\n- done task #done\n\ngroup2;\n-neko\n-inu #dog",
 	TYPE_TASK: 0,
 	TYPE_GROUP: 1,
 	TYPE_TEXT: 2
@@ -67,6 +67,7 @@ taskpaper.parseLine = function(line){
 taskpaper.parse = function(str){
 	var group = {
 		name: "default:",
+		opened: true,
 		tasks: {},
 		hasTask: false
 	};
@@ -89,6 +90,7 @@ taskpaper.parse = function(str){
 			if(group.hasTask) res[count.group++] = mouf.clone(group);
 
 			group.name = parsedItem.caption;
+			group.opened = parsedItem.opened;
 			group.tasks = {};
 			group.hasTask = false;
 		} else if(parsedItem.type === taskpaper.constant.TYPE_TEXT){
@@ -148,19 +150,23 @@ taskpaper.parse = function(str){
 		}
 	});
 
-	mouf.addHandler("update", function(conn, req, res){
+	mouf.addHandler("toggle_task", function(conn, req, res){
 		var result = "error";
 		if(req.method === "POST" && conn.isOwner && req.bodyItems.id && req.bodyItems.checked && req.bodyItems.page){
 			var id = parseInt(req.bodyItems.id[0]);
 			var checked = (req.bodyItems.checked[0] === "true") ? true : false;
 			var page = req.bodyItems.page[0];
+			var changed = false;
 
 			taskpaper.page = page;
 			var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
 			var newContent = [];
 			var newLine = null;
-			mouf.each(content.split(/[\r\n]+/), function(index){
-				if(index !== id){
+			var index = -1;
+			mouf.each(content.split(/[\r\n]+/), function(){
+				if(mouf.trim(this).indexOf("-") === 0) ++index;
+
+				if(index !== id || changed){
 					newContent.push(this);
 				} else {
 					if(checked){
@@ -169,13 +175,52 @@ taskpaper.parse = function(str){
 						newLine = this.replace("#done", "").replace("  ", " ");
 					}
 					newContent.push(newLine);
+					changed = true;
 				}
 			});
 			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
-			result = "success"
+			if(changed) result = "success"
 		}
 		return result;
 	});
+
+	mouf.addHandler("toggle_group", function(conn, req, res){
+		var result = "error";
+		if(req.method === "POST" && conn.isOwner && req.bodyItems.id && req.bodyItems.opened && req.bodyItems.page){
+			var id = parseInt(req.bodyItems.id[0]);
+			var opened = (req.bodyItems.opened[0] === "true") ? true : false;
+			var page = req.bodyItems.page[0];
+			var changed = false;
+
+			taskpaper.page = page;
+			var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
+			var newContent = [];
+			var newLine = null;
+			var index = -1;
+			mouf.each(content.split(/[\r\n]+/), function(){
+				var trimedLine = mouf.trim(this);
+				if(/[:;]\s*$/.test(trimedLine)) ++index;
+
+				if(index !== id || changed){
+					newContent.push(this);
+				} else {
+					mouf.debug("before = " + trimedLine);
+					if(opened){
+						newLine = trimedLine.replace(/:\s*$/, ";");
+					} else {
+						newLine = trimedLine.replace(/;\s*$/, ":");
+					}
+					newContent.push(newLine);
+					mouf.debug("after = " + newLine);
+					changed = true;
+				}
+			});
+			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
+			if(changed) result = "success"
+		}
+		return result;
+	});
+
 })();
 
 
