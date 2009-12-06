@@ -28,6 +28,11 @@ div.clearer {
 	margin-bottom: 5px;
 }
 #header h1 {
+/*
+	background: #fff url(../img/favicon32.png) no-repeat left 50%;
+	padding-left: 35px;
+	height: 32px;
+	*/
 	float: left;
 	margin-right: 10px;
 	font-size: medium;
@@ -43,6 +48,10 @@ div.clearer {
 	float: left;
 	margin-left: 5px;
 }
+#header form {
+	float: right;
+	margin-right: 10px;
+}
 #header a.edit {
 	background: transparent url(../img/edit.png) no-repeat left 50%;
 }
@@ -50,6 +59,17 @@ div.clearer {
 	background: transparent url(../img/home.png) no-repeat left 50%;
 }
 
+#header form input#login, #header form input#password {
+	padding-left: 20px;
+	border: 1px solid #a00;
+	width: 6em;
+}
+#header form input#login {
+	background: #fff url(../img/login.png) no-repeat left 50%;
+}
+#header form input#password {
+	background: #fff url(../img/unlock.png) no-repeat left 50%;
+}
 
 /* =container */
 #container {
@@ -123,6 +143,7 @@ div.clearer {
 	margin-top: 10px;
 }
 #footer p {
+	text-align: right;
 	font-size: x-small;
 	color: #777;
 }

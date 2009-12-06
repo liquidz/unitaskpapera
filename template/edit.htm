@@ -9,8 +9,9 @@
 <form method="POST" action="{{root}}/main/{{page}}" enctype="multipart/form-data">
   <textarea name="data" cols="80" rows="20">{{data}}</textarea><br />
   <input type="submit" value="save">
-  <a href="{{root}}/main/{{page}}">back to {{page}}</a>
+  <input type="hidden" name="sessid" value="{{sessid}}" />
 </form>
+  <p><a href="{{root}}/main/{{page}}?sessid={{sessid}}">back to {{page}}</a></p>
 </body>
  
 </html>

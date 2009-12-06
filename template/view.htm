@@ -11,9 +11,20 @@
 	<div id="header">
 		<h1>unitaskpapera</h1>
 		<!-- =edit link -->
-		<p data-keep-if="owner"><a href="{{root}}/edit/{{page}}" class="edit">edit</a></p>
+		<p data-keep-if="logined"><a href="{{root}}/edit/{{page}}?sessid={{sessid}}" class="edit">edit</a></p>
 		<!-- =back link -->
 		<p data-remove-if="isIndex"><a href="{{root}}" class="back">back to index</a></p>
+		<!-- =login -->
+		<form method="POST" action="{{root}}/login" data-remove-if="logined">
+			<input type="password" name="password" id="login" />
+			<input type="submit" value="login" />
+		</form>
+		<!-- =password -->
+		<form method="POST" action="{{root}}/change_password" data-keep-if="owner">
+			<input type="text" name="password" value="{{password}}" id="password" />
+			<input type="submit" value="change" />
+		</form>
+
 		<div class="clearer">&nbsp;</div>
 	</div>
 
@@ -38,7 +49,8 @@
 	
 		<input type="hidden" id="address" value="{{root}}" />
 		<input type="hidden" id="page" value="{{page}}" />
-		<input type="hidden" id="owner" value="true" data-keep-if="owner" />
+		<input type="hidden" id="logined" value="true" data-keep-if="logined" />
+		<input type="hidden" id="sessid" value="{{sessid}}" />
 	
 		<p data-remove-if="isIndex"><a href="{{root}}" class="back">back to index</a></p>
 	</div>
