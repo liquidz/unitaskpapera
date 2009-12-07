@@ -1,0 +1,25 @@
+<ul class="items">
+<li data-list="items[].value.tasks">
+	<!-- =check box -->
+	<input type="checkbox" id="item_{{items[].value.tasks[].key}}" checked="checked" data-keep-if="items[].value.tasks[].value.done" />
+	<input type="checkbox" id="item_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done" />
+	
+	<!-- =task caption -->
+	<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" class="done" data-keep-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
+	<label for="item_{{items[].value.tasks[].key}}" id="label_{{items[].value.tasks[].key}}" data-remove-if="items[].value.tasks[].value.done">{{items[].value.tasks[].value.caption}}</label>
+
+	<!-- =tags -->
+	<span class="tag t{{items[].value.tasks[].key}}" data-list="items[].value.tasks[].value.tags">
+		{{items[].value.tasks[].value.tags[]}}
+	</span>
+
+	<!-- =text -->
+	<p class="text done" data-keep-if="items[].value.tasks[].value.done" data-list="items[].value.tasks[].value.text">
+		{{items[].value.tasks[].value.text[]}}
+	</p>
+	<p class="text" data-remove-if="items[].value.tasks[].value.done" data-list="items[].value.tasks[].value.text">
+		{{items[].value.tasks[].value.text[]}}
+	</p>
+
+</li>
+</ul>

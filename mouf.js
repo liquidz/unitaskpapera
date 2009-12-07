@@ -10,8 +10,10 @@ mouf.setting = {
 	ERROR_PAGE_TEMPLATE: null
 };
 
-mouf.service.path = opera.io.webserver.currentServicePath.substr(0, opera.io.webserver.currentServicePath.length - 1);
-mouf.service.name = opera.io.webserver.currentServiceName;
+mouf.service = {
+	path: opera.io.webserver.currentServicePath.substr(0, opera.io.webserver.currentServicePath.length - 1),
+	name: opera.io.webserver.currentServiceName
+};
 
 // =addHandler
 mouf.addHandler = function(path, fn){
