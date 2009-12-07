@@ -6,8 +6,12 @@ var mouf = {};
 mouf.handlers = [];
 
 mouf.setting = {
-	SESSION_EXPIRE: 1000 * 60 * 10 // 10 min
+	SESSION_EXPIRE: 1000 * 60 * 10, // 10 min
+	ERROR_PAGE_TEMPLATE: null
 };
+
+mouf.service.path = opera.io.webserver.currentServicePath.substr(0, opera.io.webserver.currentServicePath.length - 1);
+mouf.service.name = opera.io.webserver.currentServiceName;
 
 // =addHandler
 mouf.addHandler = function(path, fn){
@@ -19,14 +23,26 @@ mouf.addHandler = function(path, fn){
 			var result = fn(connection, request, response);
 			if(result) response.write(result);
 		} catch(e){
+			// error
 			response.setStatusCode("500", "Internal Server Error");
-			response.setResponseHeader("Content-Type", "text/plain");
-			response.write("Internal Server Error\n\n");
-			response.write(e);
+			if(mouf.setting.ERROR_PAGE_TEMPLATE === null){
+				// default error
+				response.setResponseHeader("Content-Type", "text/plain");
+				response.write("Internal Server Error\n\n");
+				response.write(e);
+			} else {
+				// custom error page
+				response.write(mouf.render(mouf.setting.ERROR_PAGE_TEMPLATE, {exception: e}));
+			}
 		} finally {
 			response.close();
 		}
 	}]);
+};
+
+// =setDefaultErrorPage
+mouf.setDefaultErrorPage = function(templateName){
+	if(templateName) mouf.setting.ERROR_PAGE_TEMPLATE = templateName;
 };
 
 // =set
@@ -60,73 +76,66 @@ mouf.httpPost = function(url, postData, callback){
 	xhr.send(postData);
 };
 
-// =getAddress
-mouf.getAddress = function(request){
-	var address = null;
-	var path = request.uri.split("/");
-	if(path.length > 1){
-		address = "/" + path[1];
-		var index = address.indexOf("?");
-		if(index !== -1){
-			address = address.substr(0, index);
-		}
-	}
-	//return (path.length > 1) ? "/" + path[1] : null;
-	return address;
-};
-
 // =render
 mouf.render = function(templateName, data){
 	var template = new Markuper(templateName, data);
 	return template.parse().html();
 };
 
+// =location
 mouf.location = function(response, url){
 	response.setStatusCode("302", "Found");
 	response.setResponseHeader("Location", url);
 	response.close();
 };
 
-mouf.session = [];
-mouf.getSession = function(sessionID){
-	return mouf.find(mouf.session, function(){ return this[0] === sessionID; });
+
+// session manage {{{
+mouf.session = {};
+mouf.session.table = [];
+
+// =session.get
+mouf.session.get = function(sessionID){
+	return mouf.find(mouf.session.table, function(){ return this[0] === sessionID; });
 };
 
-mouf.makeSessionKey = function(n, b){
+// =session.makeKey
+mouf.session.makeKey = function(n, b){
 	b = b || "";
 	var data = ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" + b).split("");
 	var res = "";
 	for(var i = 0; i < n; ++i){
 		res += data[Math.floor(Math.random() * data.length)];
 	}
-	return (mouf.getSession(res) !== null) ? mouf.makeSessionKey(n, b) : res;
+	return (mouf.session.get(res) !== null) ? mouf.session.makeKey(n, b) : res;
 };
 
-mouf.checkSession = function(sessionID){
-	var sess = mouf.getSession(sessionID);
+// =session.check
+mouf.session.check = function(sessionID){
+	var sess = mouf.session.get(sessionID);
 	return (sess !== null
 		&& ((new Date).getTime() - sess[1].getTime()) < mouf.setting.SESSION_EXPIRE) ? true : false;
 };
 
-mouf.storeSession = function(sessionID){
-	//if(mouf.session[sessionID]){
-	if(mouf.getSession(sessionID) !== null){
+// =session.store
+mouf.session.store = function(sessionID){
+	if(mouf.session.get(sessionID) !== null){
 		return false;
 	} else {
-		//mouf.session[sessionID] = new Date();
-		mouf.session.push([sessionID, new Date()]);
+		mouf.session.table.push([sessionID, new Date()]);
 		return true;
 	}
 };
 
-mouf.expireSession = function(sessionID){
-	mouf.session = mouf.filter(mouf.session, function(){
+// =session.expire
+mouf.session.expire = function(sessionID){
+	mouf.session.table = mouf.filter(mouf.session.table, function(){
 		return (this[0] !== sessionID);
 	});
-	//if(mouf.session[sessionID]) mouf.session[sessionID] = null;
 };
+// }}}
 
-// ___ utility ___ {{{
+// utility {{{
 
 // =each
 mouf.each = function(arr, fn){
@@ -142,18 +151,12 @@ mouf.each = function(arr, fn){
 // =find
 mouf.find = function(arr, fn){
 	var found = null;
-	/*
-	mouf.each(arr, function(index){
-		if(fn.appy(obj, [index])){
-			found = index;
-			return true;
-		}
-	});
-	*/
-	for(var i = 0, l = arr.length; i < l; ++i){
-		if(fn.apply(arr[i], [i])){
-			found = i;
-			break;
+	if(arr instanceof Array){
+		for(var i = 0, l = arr.length; i < l; ++i){
+			if(fn.apply(arr[i], [i])){
+				found = i;
+				break;
+			}
 		}
 	}
 	return (found === null) ? null : arr[found];
@@ -163,9 +166,9 @@ mouf.find = function(arr, fn){
 mouf.filter = function(arr, fn){
 	if(arr instanceof Array){
 		var newArr = [];
-		mouf.each(arr, function(index){
-			if(fn.appy(this, [index])) newArr.push(this);
-		});
+		for(var i = 0, l = arr.length; i < l; ++i){
+			if(fn.appy(arr[i], [i])) newArr.push(arr[i]);
+		}
 		return newArr;
 	}
 	return arr;

@@ -1,17 +1,16 @@
 var taskpaper = {};
 // =constant {{{
 taskpaper.constant = {
-	APP_NAME: "unitaskpapera",
 	DEFAULT_PAGE: "index",
 	DEFAULT_CONTENT: "group:\n- sample\n- done task #done\n\ngroup2;\n-neko\n-inu #dog",
 	TYPE_TASK: 0,
 	TYPE_GROUP: 1,
 	TYPE_TEXT: 2,
-	PASSWORD_KEY: "unitaskpapera_pw"
+	PASSWORD_KEY: mouf.service.name + "_pw"
 }; // }}}
 taskpaper.page = taskpaper.constant.DEFAULT_PAGE;
 taskpaper.makeKeyName = function(){
-	return this.constant.APP_NAME + "_" + this.page;
+	return mouf.service.name + "_" + this.page;
 };
 
 // =parseLine {{{
@@ -122,9 +121,8 @@ taskpaper.isLogined = function(conn){
 		}
 
 		if(sessid === null) return false;
-		else return mouf.checkSession(sessid);
+		else return mouf.session.check(sessid);
 	}
-	//return (conn.isOwner || (req && req.queryItems.sessid && mouf.checkSession(req.queryItems.sessid[0]))) ? true : false;
 };
 
 (function(){
@@ -149,7 +147,7 @@ taskpaper.isLogined = function(conn){
 			password = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
 			// set default password
 			if(password === ""){
-				password = mouf.makeSessionKey(5, taskpaper.constant.APP_NAME);
+				password = mouf.session.makeKey(5, mouf.service.name);
 				mouf.set(taskpaper.constant.PASSWORD_KEY, password);
 			}
 		}
@@ -164,7 +162,7 @@ taskpaper.isLogined = function(conn){
 			owner: conn.isOwner,
 			items: taskpaper.parse(mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT)),
 			isIndex: (taskpaper.page === taskpaper.constant.DEFAULT_PAGE),
-			root: mouf.getAddress(req),
+			root: mouf.service.path,
 			logined: logined,
 			password: password,
 			sessid: (req.queryItems.sessid) ? req.queryItems.sessid[0] : ""
@@ -175,47 +173,43 @@ taskpaper.isLogined = function(conn){
 	mouf.addHandler("_index", main);
 	mouf.addHandler("main", main);
 	mouf.addHandler("edit", function(conn, req, res){
-		var root = mouf.getAddress(req);
-		//if(conn.isOwner){
 		if(taskpaper.isLogined(conn)){
 			taskpaper.page = getPageName(req);
 			return mouf.render("template/edit.htm", {
 				page: taskpaper.page,
-				root: root,
+				root: mouf.service.path,
 				data: mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT),
 				sessid: (req.queryItems.sessid) ? req.queryItems.sessid[0] : ""
 			});
 		} else {
 			// location to top
-			mouf.location(res, root);
+			mouf.location(res, mouf.service.path);
 		}
 	});
 
 	mouf.addHandler("login", function(conn, req, res){
-		var root = mouf.getAddress(req);
 		if(req.bodyItems.password){
 			if(mouf.trim(req.bodyItems.password[0]) === mouf.get(taskpaper.constant.PASSWORD_KEY)){
-				var sessid = mouf.makeSessionKey(20);
-				mouf.storeSession(sessid);
-				mouf.location(res, root + "/main?sessid=" + sessid);
+				var sessid = mouf.session.makeKey(20);
+				mouf.session.store(sessid);
+				mouf.location(res, mouf.service.path + "/main?sessid=" + sessid);
 			} else {
 				return mouf.render("template/error.htm", {
 					msg: "password is not correct",
-					root: root
+					root: mouf.service.path
 				});
 			}
 		} else {
-			mouf.location(res, root);
+			mouf.location(res, mouf.service.path);
 		}
 	});
 
 	mouf.addHandler("change_password", function(conn, req, res){
-		var root = mouf.getAddress(req);
 		if(conn.isOwner && req.bodyItems.password){
 			mouf.set(taskpaper.constant.PASSWORD_KEY, mouf.trim(req.bodyItems.password[0]));
-			mouf.location(res, root);
+			mouf.location(res, mouf.service.path);
 		} else {
-			mouf.location(res, root);
+			mouf.location(res, mouf.service.path);
 		}
 	});
 
@@ -227,13 +221,26 @@ taskpaper.isLogined = function(conn){
 			var id = parseInt(req.bodyItems.id[0]);
 			var checked = (req.bodyItems.checked[0] === "true") ? true : false;
 			var page = req.bodyItems.page[0];
-			var changed = false;
 
 			taskpaper.page = page;
-			var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
-			var newContent = [];
+			//var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
+			//var newContent = [];
 			var newLine = null;
 			var index = -1;
+			var changed = false;
+
+			taskpaper.mapContents(function(line){
+				if(line.indexOf("-") === 0) ++index;
+
+				if(index !== id || changed){
+					return line;
+				} else {
+					changed = true;
+					return (checked) ? line + " #done" : line.replace("#done", "").replace("  ", " ");
+				}
+			});
+
+/*
 			mouf.each(content.split(/[\r\n]+/), function(){
 				if(mouf.trim(this).indexOf("-") === 0) ++index;
 
@@ -250,6 +257,7 @@ taskpaper.isLogined = function(conn){
 				}
 			});
 			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
+			*/
 			if(changed) result = "success";
 		}
 		return result;
@@ -263,13 +271,28 @@ taskpaper.isLogined = function(conn){
 			var id = parseInt(req.bodyItems.id[0]);
 			var opened = (req.bodyItems.opened[0] === "true") ? true : false;
 			var page = req.bodyItems.page[0];
-			var changed = false;
 
 			taskpaper.page = page;
-			var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
-			var newContent = [];
+
+			//var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
+			//var newContent = [];
 			var newLine = null;
 			var index = -1;
+			var changed = false;
+
+			taskpaper.mapContents(function(line){
+				if(/[:;]\s*$/.test(line)) ++index;
+
+				if(index !== id || changed){
+					return this;
+				} else {
+					changed = true;
+					return (opened) ? line.replace(/:\s*$/, ";") : line.replace(/;\s*$/, ":");
+				}
+			});
+			if(changed) result = "success";
+
+/*
 			mouf.each(content.split(/[\r\n]+/), function(){
 				var trimedLine = mouf.trim(this);
 				if(/[:;]\s*$/.test(trimedLine)) ++index;
@@ -288,10 +311,19 @@ taskpaper.isLogined = function(conn){
 			});
 			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
 			if(changed) result = "success";
+*/
 		}
 		return result;
 	}); // }}}
 
 })();
 
+taskpaper.mapContents = function(fn){
+	var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
+	var newContent = [];
+	mouf.each(content.split(/[\r\n]+/), function(){
+		newContent.push(fn(mouf.trim(this)));
+	});
+	mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
+};
 
