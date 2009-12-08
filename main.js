@@ -108,6 +108,7 @@ taskpaper.parse = function(str){
 	return res;
 }; // }}}
 
+/*
 taskpaper.isLogined = function(conn){
 	var req = conn.request;
 	if(conn.isOwner){
@@ -124,6 +125,7 @@ taskpaper.isLogined = function(conn){
 		else return mouf.session.check(sessid);
 	}
 };
+*/
 
 (function(){
 	var getPageName = function(req){
@@ -141,7 +143,7 @@ taskpaper.isLogined = function(conn){
 
 	// main
 	var main = function(conn, req, res){
-		var logined = taskpaper.isLogined(conn);
+		var logined = mouf.session.isLogined(conn);//taskpaper.isLogined(conn);
 		var password = "";
 		if(conn.isOwner){
 			password = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
@@ -173,7 +175,8 @@ taskpaper.isLogined = function(conn){
 	mouf.addHandler("_index", main);
 	mouf.addHandler("main", main);
 	mouf.addHandler("edit", function(conn, req, res){
-		if(taskpaper.isLogined(conn)){
+		//if(taskpaper.isLogined(conn)){
+		if(mouf.session.isLogined(conn)){
 			taskpaper.page = getPageName(req);
 			return mouf.render("template/edit.htm", {
 				page: taskpaper.page,
@@ -217,17 +220,15 @@ taskpaper.isLogined = function(conn){
 	mouf.addHandler("toggle_task", function(conn, req, res){
 		var result = "error";
 		if(req.method === "POST" && req.bodyItems.id && req.bodyItems.checked
-								&& req.bodyItems.page && taskpaper.isLogined(conn)){
+								&& req.bodyItems.page && mouf.session.isLogined(conn)){
+								//&& req.bodyItems.page && taskpaper.isLogined(conn)){
 			var id = parseInt(req.bodyItems.id[0]);
 			var checked = (req.bodyItems.checked[0] === "true") ? true : false;
-			var page = req.bodyItems.page[0];
-
-			taskpaper.page = page;
-			//var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
-			//var newContent = [];
 			var newLine = null;
 			var index = -1;
 			var changed = false;
+
+			taskpaper.page = req.bodyItems.page[0];
 
 			taskpaper.mapContents(function(line){
 				if(line.indexOf("-") === 0) ++index;
@@ -240,24 +241,6 @@ taskpaper.isLogined = function(conn){
 				}
 			});
 
-/*
-			mouf.each(content.split(/[\r\n]+/), function(){
-				if(mouf.trim(this).indexOf("-") === 0) ++index;
-
-				if(index !== id || changed){
-					newContent.push(this);
-				} else {
-					if(checked){
-						newLine = this + " #done";
-					} else {
-						newLine = this.replace("#done", "").replace("  ", " ");
-					}
-					newContent.push(newLine);
-					changed = true;
-				}
-			});
-			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
-			*/
 			if(changed) result = "success";
 		}
 		return result;
@@ -267,18 +250,15 @@ taskpaper.isLogined = function(conn){
 	mouf.addHandler("toggle_group", function(conn, req, res){
 		var result = "error";
 		if(req.method === "POST" && req.bodyItems.id && req.bodyItems.opened
-							&& req.bodyItems.page && taskpaper.isLogined(conn)){
+							&& req.bodyItems.page && mouf.session.isLogined(conn)){
+							//&& req.bodyItems.page && taskpaper.isLogined(conn)){
 			var id = parseInt(req.bodyItems.id[0]);
 			var opened = (req.bodyItems.opened[0] === "true") ? true : false;
-			var page = req.bodyItems.page[0];
-
-			taskpaper.page = page;
-
-			//var content = mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
-			//var newContent = [];
 			var newLine = null;
 			var index = -1;
 			var changed = false;
+
+			taskpaper.page = req.bodyItems.page[0];
 
 			taskpaper.mapContents(function(line){
 				if(/[:;]\s*$/.test(line)) ++index;
@@ -291,27 +271,6 @@ taskpaper.isLogined = function(conn){
 				}
 			});
 			if(changed) result = "success";
-
-/*
-			mouf.each(content.split(/[\r\n]+/), function(){
-				var trimedLine = mouf.trim(this);
-				if(/[:;]\s*$/.test(trimedLine)) ++index;
-
-				if(index !== id || changed){
-					newContent.push(this);
-				} else {
-					if(opened){
-						newLine = trimedLine.replace(/:\s*$/, ";");
-					} else {
-						newLine = trimedLine.replace(/;\s*$/, ":");
-					}
-					newContent.push(newLine);
-					changed = true;
-				}
-			});
-			mouf.set(taskpaper.makeKeyName(), newContent.join("\n"));
-			if(changed) result = "success";
-*/
 		}
 		return result;
 	}); // }}}

@@ -4,23 +4,45 @@
 
 var mouf = {};
 mouf.handlers = [];
+mouf.cache = {};
 
+// =service {{{
+mouf.service = {
+	path: opera.io.webserver.currentServicePath.substr(0,
+			opera.io.webserver.currentServicePath.length - 1),
+	name: opera.io.webserver.currentServiceName
+}; // }}}
+
+// =setting {{{
 mouf.setting = {
 	SESSION_EXPIRE: 1000 * 60 * 10, // 10 min
+	SESSION_ID: "sessid",
 	ERROR_PAGE_TEMPLATE: null
 };
 
-mouf.service = {
-	path: opera.io.webserver.currentServicePath.substr(0, opera.io.webserver.currentServicePath.length - 1),
-	name: opera.io.webserver.currentServiceName
+mouf.setting.sessionExpire = function(msec){
+	return (msec) ? (mouf.setting.SESSION_EXPIRE = msec) : mouf.setting.SESSION_EXPIRE;
 };
 
-// =addHandler
+mouf.setting.errorPage = function(templateName){
+	return (templateName) ? (mouf.setting.ERROR_PAGE_TEMPLATE = templateName) : mouf.setting.ERROR_PAGE_TEMPLATE;
+};
+
+mouf.setting.sessionID = function(sid){
+	return (sid) ? (mouf.setting.SESSION_ID = sid) : mouf.setting.SESSION_ID;
+};
+// }}}
+
+// =addHandler {{{
 mouf.addHandler = function(path, fn){
 	this.handlers.push([path, function(event){
 		var connection = event.connection;
 		var request = connection.request;
 		var response = connection.response;
+
+		// use mouf.session.isLogined
+		mouf.cache.connection = connection;
+
 		try {
 			var result = fn(connection, request, response);
 			if(result) response.write(result);
@@ -40,13 +62,9 @@ mouf.addHandler = function(path, fn){
 			response.close();
 		}
 	}]);
-};
+}; // }}}
 
-// =setDefaultErrorPage
-mouf.setDefaultErrorPage = function(templateName){
-	if(templateName) mouf.setting.ERROR_PAGE_TEMPLATE = templateName;
-};
-
+// preference set/get {{{
 // =set
 mouf.set = function(key, value){
 	widget.setPreferenceForKey(value, key);
@@ -56,7 +74,9 @@ mouf.set = function(key, value){
 mouf.get = function(key, defaultValue){
 	return widget.preferenceForKey(key) || (defaultValue ? defaultValue : "");
 };
+// }}}
 
+// http get/post {{{
 // =httpGet
 mouf.httpGet = function(url, callback){
 	var xhr = new XMLHttpRequest();
@@ -77,6 +97,7 @@ mouf.httpPost = function(url, postData, callback){
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 	xhr.send(postData);
 };
+// }}}
 
 // =render
 mouf.render = function(templateName, data){
@@ -90,7 +111,6 @@ mouf.location = function(response, url){
 	response.setResponseHeader("Location", url);
 	response.close();
 };
-
 
 // session manage {{{
 mouf.session = {};
@@ -114,7 +134,7 @@ mouf.session.makeKey = function(n, b){
 
 // =session.check
 mouf.session.check = function(sessionID){
-	var sess = mouf.session.get(sessionID);
+	var sess = (sessionID instanceof Array) ? sessionID : mouf.session.get(sessionID);
 	return (sess !== null
 		&& ((new Date).getTime() - sess[1].getTime()) < mouf.setting.SESSION_EXPIRE) ? true : false;
 };
@@ -135,10 +155,26 @@ mouf.session.expire = function(sessionID){
 		return (this[0] !== sessionID);
 	});
 };
+
+// =isLogined
+mouf.session.isLogined = function(connection){
+	var conn = (connection) ? connection : mouf.cache.connection;
+	var request = conn.request;
+
+	if(conn.isOwner){
+		return true;
+	} else {
+		var sessionID = mouf.objectGetValue(req.queryItems, mouf.setting.SESSION_ID);
+		if(sessionID === null){
+			sessionID = mouf.objectGetValue(req.bodyItems, mouf.setting.SESSION_ID);
+		}
+
+		return (sessionID === null) ? false : mouf.session.check(sessionID);
+	}
+};
 // }}}
 
 // utility {{{
-
 // =each
 mouf.each = function(arr, fn){
 	if(arr instanceof Array){
@@ -198,6 +234,41 @@ mouf.clone = function(obj){
 		}
 	}
 };
+
+// =objectKeyLoop
+mouf.objectKeyLoop = function(obj, fn){
+	if(typeof obj === "object"){
+		for(var key in obj){
+			var res = fn.apply(obj[key], [key]);
+			if(res === true) break;
+			else if(res === false) continue;
+		}
+	}
+};
+
+// =objectHasKey
+mouf.objectHasKey = function(obj, key){
+	var res = false;
+	mouf.objectKeyLoop(obj, function(k){
+		if(k === key){
+			return (res = true);
+		}
+	});
+	return res;
+};
+
+// =objectGetValue
+mouf.objectGetValue = function(obj, key){
+	var res = null;
+	mouf.objectKeyLoop(obj, function(k){
+		if(k == key){
+			res = this;
+			return true;
+		}
+	});
+	return res;
+};
+
 
 // =debug
 mouf.debug = function(str){
