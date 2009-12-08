@@ -28,7 +28,7 @@ tpApp.toggleDoneEvent = function(e){
 				$("span.t" + id).remove(":contains('done')");
 			}
 		} else {
-			e.target.checked = !checked;
+			e.target.checked = !e.target.checked;
 		}
 	});
 }; // }}}

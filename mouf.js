@@ -118,7 +118,11 @@ mouf.session.table = [];
 
 // =session.get
 mouf.session.get = function(sessionID){
-	return mouf.find(mouf.session.table, function(){ return this[0] === sessionID; });
+	if(sessionID && sessionID !== ""){
+		return mouf.find(mouf.session.table, function(){ return this[0] === sessionID; });
+	} else {
+		return null;
+	}
 };
 
 // =session.makeKey
@@ -134,7 +138,7 @@ mouf.session.makeKey = function(n, b){
 
 // =session.check
 mouf.session.check = function(sessionID){
-	var sess = (sessionID instanceof Array) ? sessionID : mouf.session.get(sessionID);
+	var sess = mouf.session.get(sessionID);
 	return (sess !== null
 		&& ((new Date).getTime() - sess[1].getTime()) < mouf.setting.SESSION_EXPIRE) ? true : false;
 };
@@ -156,19 +160,27 @@ mouf.session.expire = function(sessionID){
 	});
 };
 
-// =isLogined
-mouf.session.isLogined = function(connection){
+// =session.getId
+mouf.session.getId = function(connection){
 	var conn = (connection) ? connection : mouf.cache.connection;
 	var request = conn.request;
+
+	var sessionID = mouf.objectGetValue(request.queryItems, mouf.setting.SESSION_ID);
+	if(sessionID === null){
+		sessionID = mouf.objectGetValue(request.bodyItems, mouf.setting.SESSION_ID);
+	}
+
+	return (sessionID === null) ? "" : sessionID[0];
+};
+
+// =session.isLogined
+mouf.session.isLogined = function(connection){
+	var conn = (connection) ? connection : mouf.cache.connection;
 
 	if(conn.isOwner){
 		return true;
 	} else {
-		var sessionID = mouf.objectGetValue(req.queryItems, mouf.setting.SESSION_ID);
-		if(sessionID === null){
-			sessionID = mouf.objectGetValue(req.bodyItems, mouf.setting.SESSION_ID);
-		}
-
+		var sessionID = mouf.session.getId(conn);
 		return (sessionID === null) ? false : mouf.session.check(sessionID);
 	}
 };

@@ -108,25 +108,6 @@ taskpaper.parse = function(str){
 	return res;
 }; // }}}
 
-/*
-taskpaper.isLogined = function(conn){
-	var req = conn.request;
-	if(conn.isOwner){
-		return true;
-	} else {
-		var sessid = null;
-		if(req.queryItems.sessid){
-			sessid = req.queryItems.sessid[0];
-		} else if(req.bodyItems.sessid){
-			sessid = req.bodyItems.sessid[0];
-		}
-
-		if(sessid === null) return false;
-		else return mouf.session.check(sessid);
-	}
-};
-*/
-
 (function(){
 	var getPageName = function(req){
 		var pageName = taskpaper.constant.DEFAULT_PAGE;
@@ -143,7 +124,7 @@ taskpaper.isLogined = function(conn){
 
 	// main
 	var main = function(conn, req, res){
-		var logined = mouf.session.isLogined(conn);//taskpaper.isLogined(conn);
+		var logined = mouf.session.isLogined(conn);
 		var password = "";
 		if(conn.isOwner){
 			password = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
@@ -167,7 +148,7 @@ taskpaper.isLogined = function(conn){
 			root: mouf.service.path,
 			logined: logined,
 			password: password,
-			sessid: (req.queryItems.sessid) ? req.queryItems.sessid[0] : ""
+			sessid: mouf.session.getId(conn)
 		});
 	};
 
@@ -175,14 +156,13 @@ taskpaper.isLogined = function(conn){
 	mouf.addHandler("_index", main);
 	mouf.addHandler("main", main);
 	mouf.addHandler("edit", function(conn, req, res){
-		//if(taskpaper.isLogined(conn)){
 		if(mouf.session.isLogined(conn)){
 			taskpaper.page = getPageName(req);
 			return mouf.render("template/edit.htm", {
 				page: taskpaper.page,
 				root: mouf.service.path,
 				data: mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT),
-				sessid: (req.queryItems.sessid) ? req.queryItems.sessid[0] : ""
+				sessid: mouf.session.getId(conn)
 			});
 		} else {
 			// location to top
@@ -221,7 +201,6 @@ taskpaper.isLogined = function(conn){
 		var result = "error";
 		if(req.method === "POST" && req.bodyItems.id && req.bodyItems.checked
 								&& req.bodyItems.page && mouf.session.isLogined(conn)){
-								//&& req.bodyItems.page && taskpaper.isLogined(conn)){
 			var id = parseInt(req.bodyItems.id[0]);
 			var checked = (req.bodyItems.checked[0] === "true") ? true : false;
 			var newLine = null;
@@ -251,7 +230,6 @@ taskpaper.isLogined = function(conn){
 		var result = "error";
 		if(req.method === "POST" && req.bodyItems.id && req.bodyItems.opened
 							&& req.bodyItems.page && mouf.session.isLogined(conn)){
-							//&& req.bodyItems.page && taskpaper.isLogined(conn)){
 			var id = parseInt(req.bodyItems.id[0]);
 			var opened = (req.bodyItems.opened[0] === "true") ? true : false;
 			var newLine = null;
