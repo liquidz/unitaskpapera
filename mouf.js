@@ -101,7 +101,14 @@ mouf.httpPost = function(url, postData, callback){
 
 // =render
 mouf.render = function(templateName, data){
-	var template = new Markuper(templateName, data);
+	var _data = mouf.clone(data);
+	_data.isOwner = mouf.cache.connection.isOwner;
+	_data.appName = mouf.service.name;
+	_data.appPath = mouf.service.path;
+	_data.sessionID = mouf.session.getId();
+	_data.logined = mouf.session.isLogined();
+
+	var template = new Markuper(templateName, _data);
 	return template.parse().html();
 };
 
@@ -298,12 +305,6 @@ mouf.debug = function(str){
 		mouf.each(mouf.handlers, function(){
 			opera.io.webserver.addEventListener(this[0], this[1], false);
 		});
-		/*
-		for(var i = 0, l = mouf.handlers.length; i < l; ++i){
-			var h = mouf.handlers[i];
-			opera.io.webserver.addEventListener(h[0], h[1], false);
-		}
-		*/
 
 		if(_onload) _onload();
 	};

@@ -108,6 +108,15 @@ taskpaper.parse = function(str){
 	return res;
 }; // }}}
 
+taskpaper.getPassword = function(){
+	var pw = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
+	if(pw === ""){
+		pw = mouf.session.makeKey(5, mouf.service.name);
+		mouf.set(taskpaper.constant.PASSWORD_KEY, pw);
+	}
+	return pw;
+};
+
 (function(){
 	var getPageName = function(req){
 		var pageName = taskpaper.constant.DEFAULT_PAGE;
@@ -125,7 +134,8 @@ taskpaper.parse = function(str){
 	// main
 	var main = function(conn, req, res){
 		var logined = mouf.session.isLogined(conn);
-		var password = "";
+		//var password = (conn.isOwner) ? taskpaper.getPassword() : "";
+		/*
 		if(conn.isOwner){
 			password = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
 			// set default password
@@ -134,6 +144,7 @@ taskpaper.parse = function(str){
 				mouf.set(taskpaper.constant.PASSWORD_KEY, password);
 			}
 		}
+		*/
 
 		taskpaper.page = getPageName(req);
 		if(req.method === "POST" && req.bodyItems.data && logined){
@@ -147,7 +158,7 @@ taskpaper.parse = function(str){
 			isIndex: (taskpaper.page === taskpaper.constant.DEFAULT_PAGE),
 			root: mouf.service.path,
 			logined: logined,
-			password: password,
+			password: (conn.isOwner) ? taskpaper.getPassword() : "",
 			sessid: mouf.session.getId(conn)
 		});
 	};
@@ -172,7 +183,8 @@ taskpaper.parse = function(str){
 
 	mouf.addHandler("login", function(conn, req, res){
 		if(req.bodyItems.password){
-			if(mouf.trim(req.bodyItems.password[0]) === mouf.get(taskpaper.constant.PASSWORD_KEY)){
+			//if(mouf.trim(req.bodyItems.password[0]) === mouf.get(taskpaper.constant.PASSWORD_KEY)){
+			if(mouf.trim(req.bodyItems.password[0]) === taskpaper.getPassword()){
 				var sessid = mouf.session.makeKey(20);
 				mouf.session.store(sessid);
 				mouf.location(res, mouf.service.path + "/main?sessid=" + sessid);
