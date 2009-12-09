@@ -134,17 +134,6 @@ taskpaper.getPassword = function(){
 	// main
 	var main = function(conn, req, res){
 		var logined = mouf.session.isLogined(conn);
-		//var password = (conn.isOwner) ? taskpaper.getPassword() : "";
-		/*
-		if(conn.isOwner){
-			password = mouf.get(taskpaper.constant.PASSWORD_KEY, "");
-			// set default password
-			if(password === ""){
-				password = mouf.session.makeKey(5, mouf.service.name);
-				mouf.set(taskpaper.constant.PASSWORD_KEY, password);
-			}
-		}
-		*/
 
 		taskpaper.page = getPageName(req);
 		if(req.method === "POST" && req.bodyItems.data && logined){
@@ -153,13 +142,9 @@ taskpaper.getPassword = function(){
 
 		return mouf.render("template/view.htm", {
 			page: taskpaper.page,
-			owner: conn.isOwner,
 			items: taskpaper.parse(mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT)),
 			isIndex: (taskpaper.page === taskpaper.constant.DEFAULT_PAGE),
-			root: mouf.service.path,
-			logined: logined,
-			password: (conn.isOwner) ? taskpaper.getPassword() : "",
-			sessid: mouf.session.getId(conn)
+			password: (conn.isOwner) ? taskpaper.getPassword() : ""
 		});
 	};
 
@@ -181,9 +166,17 @@ taskpaper.getPassword = function(){
 		}
 	});
 
+	mouf.addHandler("init", function(conn, req, res){
+		var page = getPageName(req);
+		if(mouf.session.isLogined()){
+			taskpaper.page = page;
+			mouf.set(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT);
+		}
+		mouf.location(res, mouf.service.path + "/main/" + page);
+	});
+
 	mouf.addHandler("login", function(conn, req, res){
 		if(req.bodyItems.password){
-			//if(mouf.trim(req.bodyItems.password[0]) === mouf.get(taskpaper.constant.PASSWORD_KEY)){
 			if(mouf.trim(req.bodyItems.password[0]) === taskpaper.getPassword()){
 				var sessid = mouf.session.makeKey(20);
 				mouf.session.store(sessid);
@@ -254,7 +247,7 @@ taskpaper.getPassword = function(){
 				if(/[:;]\s*$/.test(line)) ++index;
 
 				if(index !== id || changed){
-					return this;
+					return line;
 				} else {
 					changed = true;
 					return (opened) ? line.replace(/:\s*$/, ";") : line.replace(/;\s*$/, ":");

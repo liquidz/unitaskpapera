@@ -6,12 +6,12 @@
   <title>unitaskpapera - {{page}} - edit</title>
 </head>
 <body>
-<form method="POST" action="{{root}}/main/{{page}}" enctype="multipart/form-data">
+<form method="POST" action="{{appPath}}/main/{{page}}" enctype="multipart/form-data">
   <textarea name="data" cols="80" rows="20">{{data}}</textarea><br />
   <input type="submit" value="save">
-  <input type="hidden" name="sessid" value="{{sessid}}" />
+  <input type="hidden" name="sessid" value="{{sessionID}}" />
 </form>
-  <p><a href="{{root}}/main/{{page}}?sessid={{sessid}}">back to {{page}}</a></p>
+  <p><a href="{{appPath}}/main/{{page}}?sessid={{sessionID}}">back to {{page}}</a></p>
 </body>
  
 </html>
