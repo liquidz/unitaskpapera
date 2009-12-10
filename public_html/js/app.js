@@ -74,7 +74,7 @@ tpApp.searchEvent = function(e){
 
 // =search
 tpApp.search = function(keyword){
-	var lis = $("ul#items li");
+	var lis = $("ul.items li");
 	if(keyword === ""){
 		lis.show();
 	} else {

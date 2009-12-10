@@ -10,10 +10,10 @@
 
 	<feature name="http://xmlns.opera.com/fileio" />
 
-	<icon height="64" width="64">public_html/img/favicon64.png</icon>icon>
-	<icon height="48" width="48">public_html/img/favicon48.png</icon>icon>
-	<icon height="32" width="32">public_html/img/favicon32.png</icon>icon>
-	<icon height="16" width="16">public_html/img/favicon16.png</icon>icon>
+	<icon width="64" height="42">public_html/img/favicon64.png</icon>icon>
+	<icon width="48" height="31">public_html/img/favicon48.png</icon>icon>
+	<icon width="32" height="21">public_html/img/favicon32.png</icon>icon>
+	<icon width="16" height="10">public_html/img/favicon16.png</icon>icon>
 
 	<author>
 		<name>Masashi Iizuka</name>
