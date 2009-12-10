@@ -123,9 +123,14 @@ mouf.location = function(response, url){
 mouf.session = {};
 mouf.session.table = [];
 
+// =sesion.isValid
+mouf.session.isValid = function(sessionID){
+	return (/^[A-Za-z0-9]+$/.test(sessionID)) ? true : false;
+};
+
 // =session.get
 mouf.session.get = function(sessionID){
-	if(sessionID && sessionID !== ""){
+	if(sessionID && sessionID !== "" && mouf.session.isValid(sessionID)){
 		return mouf.find(mouf.session.table, function(){ return this[0] === sessionID; });
 	} else {
 		return null;
@@ -155,16 +160,22 @@ mouf.session.store = function(sessionID){
 	if(mouf.session.get(sessionID) !== null){
 		return false;
 	} else {
-		mouf.session.table.push([sessionID, new Date()]);
-		return true;
+		if(mouf.session.isValid(sessionID)){
+			mouf.session.table.push([sessionID, new Date()]);
+			return true;
+		} else {
+			return false;
+		}
 	}
 };
 
 // =session.expire
 mouf.session.expire = function(sessionID){
-	mouf.session.table = mouf.filter(mouf.session.table, function(){
-		return (this[0] !== sessionID);
-	});
+	if(mouf.session.isValid(sessionID)){
+		mouf.session.table = mouf.filter(mouf.session.table, function(){
+			return (this[0] !== sessionID);
+		});
+	}
 };
 
 // =session.getId
@@ -177,7 +188,7 @@ mouf.session.getId = function(connection){
 		sessionID = mouf.objectGetValue(request.bodyItems, mouf.setting.SESSION_ID);
 	}
 
-	return (sessionID === null) ? "" : sessionID[0];
+	return (sessionID === null || !mouf.session.isValid(sessionID[0])) ? "" : sessionID[0];
 };
 
 // =session.isLogined

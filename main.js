@@ -194,7 +194,10 @@ taskpaper.getPassword = function(){
 
 	mouf.addHandler("change_password", function(conn, req, res){
 		if(conn.isOwner && req.bodyItems.password){
-			mouf.set(taskpaper.constant.PASSWORD_KEY, mouf.trim(req.bodyItems.password[0]));
+			var pw = mouf.trim(req.bodyItems.password[0]);
+			if(/^[A-Za-z0-9]+$/.test(pw)){
+				mouf.set(taskpaper.constant.PASSWORD_KEY, mouf.trim(req.bodyItems.password[0]));
+			}
 			mouf.location(res, mouf.service.path);
 		} else {
 			mouf.location(res, mouf.service.path);
