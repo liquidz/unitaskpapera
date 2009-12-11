@@ -18,8 +18,7 @@
 	
 	// =setting {{{
 	mouf.setting = {
-		SESSION_EXPIRE: 1000 * 60 * 10, // 10 min
-		//SESSION_ID: "sessid",
+		SESSION_EXPIRE: 24 * 60 * 60 * 1000, // 24h
 		SESSION_ID: "_mouf_session_id",
 		ERROR_PAGE_TEMPLATE: null
 	};
@@ -36,56 +35,6 @@
 		return (sid) ? (mouf.setting.SESSION_ID = sid) : mouf.setting.SESSION_ID;
 	};
 	// }}}
-	
-	mouf.cookie = {};
-	mouf.cookie.list = [];
-	mouf.cookie.set = function(key, value, expire, path){
-		if(key && value){
-			var d = null;
-			var p = (path) ? path : mouf.service.path;
-
-			if(expire){
-				d = new Date(expire);
-			} else {
-				d = new Date();
-				d.setTime(d.getTime() + mouf.setting.SESSION_EXPIRE);
-			}
-
-			mouf.cookie.list.push([key, value, d.toGMTString(), p]);
-		}
-	};
-	mouf.cookie.get = function(key, connection){
-		var res = null;
-		if(key){
-			var cookie = (connection)
-							? connection.request.headers.Cookie[0]
-							: mouf.cache.connection.request.headers.Cookie[0];
-			mouf.each(cookie.split(/\s*;\s*/), function(){
-				var kv = this.split("=");
-				if(kv[0] === key){
-					res = decodeURIComponent(kv[1]);
-					return true;
-				}
-			});
-		}
-
-		return res;
-	};
-
-	mouf.cookie.setToResponse = function(conn){
-		var res = (conn) ? conn.response : mouf.cache.connection.response;
-		if(mouf.cookie.list.length > 0){
-			mouf.each(mouf.cookie.list, function(){
-				if(this.length === 4){
-					res.setResponseHeader(
-						"Set-Cookie", this[0] + "=" + this[1]
-						+ "; expires=" + this[2] + "; path=" + this[3]
-					);
-				}
-			});
-			mouf.cookie.list = [];
-		}
-	};
 	
 	// =addHandler {{{
 	mouf.addHandler = function(path, fn){
@@ -265,6 +214,63 @@
 	};
 	// }}}
 	
+	// cookie manage {{{
+	mouf.cookie = {};
+	mouf.cookie.list = [];
+
+	// =cookie.set
+	mouf.cookie.set = function(key, value, expire, path){
+		if(key && value){
+			var d = null;
+			var p = (path) ? path : mouf.service.path;
+
+			if(expire){
+				d = new Date(expire);
+			} else {
+				d = new Date();
+				d.setTime(d.getTime() + mouf.setting.SESSION_EXPIRE);
+			}
+
+			mouf.cookie.list.push([key, value, d.toGMTString(), p]);
+		}
+	};
+
+	// =cookie.get
+	mouf.cookie.get = function(key, connection){
+		var res = null;
+		if(key){
+			var cookie = (connection)
+							? connection.request.headers.Cookie[0]
+							: mouf.cache.connection.request.headers.Cookie[0];
+			mouf.each(cookie.split(/\s*;\s*/), function(){
+				var kv = this.split("=");
+				if(kv[0] === key){
+					res = decodeURIComponent(kv[1]);
+					return true;
+				}
+			});
+		}
+
+		return res;
+	};
+
+	// =cookie.setToResponse
+	mouf.cookie.setToResponse = function(conn){
+		var res = (conn) ? conn.response : mouf.cache.connection.response;
+		if(mouf.cookie.list.length > 0){
+			mouf.each(mouf.cookie.list, function(){
+				if(this.length === 4){
+					res.setResponseHeader(
+						"Set-Cookie", this[0] + "=" + this[1]
+						+ "; expires=" + this[2] + "; path=" + this[3]
+					);
+				}
+			});
+			mouf.cookie.list = [];
+		}
+	};
+	// }}}
+
 	// utility {{{
 	// =each
 	mouf.each = function(arr, fn){
