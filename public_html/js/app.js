@@ -10,13 +10,11 @@ tpApp.toggleDoneEvent = function(e){
 	var page = $("#page").val();
 	var id = e.target.id.split("_")[1];
 	var checked = (e.target.checked) ? "true" : "false";
-	var sessid = $("#sessid").val();
 
 	$.post(address + "/toggle_task", {
 		page: page,
 		id: id,
-		checked: checked,
-		sessid: sessid
+		checked: checked
 	}, function(res){
 		if(res === "success"){
 			var label = $("label#label_" + id);
@@ -41,13 +39,11 @@ tpApp.toggleGroup = function(e){
 	var address = $("#address").val();
 	var page = $("#page").val();
 	var opened = (elem.attr("class").indexOf("closed") === -1) ? "true" : "false";
-	var sessid = $("#sessid").val();
 
 	$.post(address + "/toggle_group", {
 		page: page,
 		id: id,
-		opened: opened,
-		sessid: sessid
+		opened: opened
 	}, function(res){
 		if(res === "success"){
 			var title = $(e.target);

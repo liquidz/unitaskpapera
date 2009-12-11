@@ -157,8 +157,7 @@ taskpaper.getPassword = function(){
 			return mouf.render("template/edit.htm", {
 				page: taskpaper.page,
 				root: mouf.service.path,
-				data: mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT),
-				sessid: mouf.session.getId(conn)
+				data: mouf.get(taskpaper.makeKeyName(), taskpaper.constant.DEFAULT_CONTENT)
 			});
 		} else {
 			// location to top
@@ -180,7 +179,7 @@ taskpaper.getPassword = function(){
 			if(mouf.trim(req.bodyItems.password[0]) === taskpaper.getPassword()){
 				var sessid = mouf.session.makeKey(20);
 				mouf.session.store(sessid);
-				mouf.location(res, mouf.service.path + "/main?sessid=" + sessid);
+				mouf.location(res, mouf.service.path);
 			} else {
 				return mouf.render("template/error.htm", {
 					msg: "password is not correct",

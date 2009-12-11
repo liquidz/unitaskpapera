@@ -11,7 +11,7 @@
 	<div id="header">
 		<h1>unitaskpapera</h1>
 		<!-- =edit link -->
-		<p data-keep-if="logined"><a href="{{appPath}}/edit/{{page}}?sessid={{sessionID}}" class="edit">edit</a></p>
+		<p data-keep-if="logined"><a href="{{appPath}}/edit/{{page}}" class="edit">edit</a></p>
 		<!-- =back link -->
 		<p data-remove-if="isIndex"><a href="{{appPath}}" class="back">back to index</a></p>
 		<!-- =login -->
@@ -50,7 +50,6 @@
 		<input type="hidden" id="address" value="{{appPath}}" />
 		<input type="hidden" id="page" value="{{page}}" />
 		<input type="hidden" id="logined" value="true" data-keep-if="logined" />
-		<input type="hidden" id="sessid" value="{{sessionID}}" />
 	
 		<p data-remove-if="isIndex"><a href="{{appPath}}" class="back">back to index</a></p>
 	</div>
