@@ -1,9 +1,9 @@
-body, h1, h2, ul, p, dl, dl dt, dl dd {
+body, h1, h2, ul, p, dl, dl dt, dl dd, form {
 	margin: 0;
 	padding: 0;
 }
 a {
-	color: #2e9dff;
+	color: #29f;
 	/*
 	border-bottom: 1px dotted #0b77d6;
 	*/
@@ -21,48 +21,66 @@ div.clearer {
 	text-indent: -10000px;
 }
 
+body {
+	text-align: center;
+}
+
+/* =wrapper */
+#wrapper {
+	width: 70%;
+	margin: 1em auto 0 auto;
+	text-align: left;
+}
+
 /* =header */
 #header {
-	background: #d10404;
-	padding: 5px 0 5px 5px;
-	margin-bottom: 5px;
+	background: transparent url(../img/head_border.png) repeat-x bottom;
+	padding-bottom: 5px;
+	margin-bottom: 0.5em;
 }
 #header h1 {
-/*
 	background: #fff url(../img/favicon32.png) no-repeat left 50%;
 	padding-left: 35px;
 	height: 32px;
-	*/
+	line-height: 32px;
+	color: #777;
+
 	float: left;
-	margin-right: 10px;
 	font-size: medium;
 }
 #header a {
-	color: #fff;
 	padding-left: 20px;
 }
-#header a:hover {
-	color: #ff5757;
-}
 #header p {
+	float: right;
+	margin-left: 20px;
+	font-size: small;
+}
+#header p#pan {
 	float: left;
-	margin-left: 5px;
+	line-height: 32px;
+	margin-left: 10px;
+	color: #a00;
+}
+#header p#pan a {
+	padding-left: 0;
 }
 #header form {
 	float: right;
-	margin-right: 10px;
+	margin-left: 20px;
 }
 #header a.edit {
 	background: transparent url(../img/edit.png) no-repeat left 50%;
 }
-#header a.back {
+/*#header a.back {*/
+a.back {
 	background: transparent url(../img/home.png) no-repeat left 50%;
 }
 
 #header form input#login, #header form input#password {
 	padding-left: 20px;
-	border: 1px solid #a00;
-	width: 6em;
+	border: 1px solid #ccc;
+	width: 7em;
 }
 #header form input#login {
 	background: #fff url(../img/login.png) no-repeat left 50%;
@@ -73,23 +91,16 @@ div.clearer {
 
 /* =container */
 #container {
-	margin-left: 10px;
-}
-#container h2 {
-	font-size: small;
-	letter-spacing: 1px;
-	float: left;
 }
 
-#container p#search_form {
-	float: left;
-	margin-left: 10px;
+#container p#search_form a {
+	font-size: small;
 }
 #container p#search_form input#search {
 	border: 1px solid #aaa;
 	background: transparent url(../img/search.png) no-repeat left 50%;
 	padding-left: 20px;
-	width: 10em;
+	width: 15em;
 }
 
 #container dl {
@@ -138,13 +149,39 @@ div.clearer {
 	font-size: small;
 }
 
+#container p#go_top {
+	text-align: right;
+}
+#container p#go_top a {
+	background: transparent url(../img/up.png) no-repeat left 50%;
+	padding-left: 20px;
+	font-size: small;
+}
+/* edit view */
+#container form#edit_form textarea {
+	width: 100%;
+	height: 25em;
+}
+#container form#edit_form p {
+	text-align: right;
+	margin-top: 5px;
+	font-size: small;
+}
+#container form#edit_form p a {
+	padding-left: 20px;
+}
+
 /* =footer */
 #footer {
-	margin-top: 10px;
+	background: #811 url(../img/foot_border.png) no-repeat left top;
+	height: 15px;
+	margin-top: 20px;
 }
 #footer p {
+	margin: 0 3px 2px 0;
 	text-align: right;
 	font-size: x-small;
-	color: #777;
+	letter-spacing: 1px;
+	color: #ddd;
 }
 

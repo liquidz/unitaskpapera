@@ -1,17 +1,39 @@
 <!DOCTYPE HTML>
 <html>
- 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>unitaskpapera - {{page}} - edit</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>unitaskpapera - {{page}} - edit</title>
+	<link rel="shortcut icon" href="{{appPath}}/img/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="{{appPath}}/css/main.css" />
+	<script type="text/javascript" src="{{appPath}}/js/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="{{appPath}}/js/jquery.textarea.js"></script>
+	<script type="text/javascript" src="{{appPath}}/js/edit.js"></script>
 </head>
 <body>
-<form method="POST" action="{{appPath}}/main/{{page}}" enctype="multipart/form-data">
-  <textarea name="data" cols="80" rows="20">{{data}}</textarea><br />
-  <input type="submit" value="save">
-</form>
-  <p><a href="{{appPath}}/main/{{page}}">back to {{page}}</a></p>
+	<div id="wrapper">
+		<div id="header">
+			<h1>unitaskpapera</h1>
+			<p id="pan">&raquo; <a href="{{appPath}}/main/{{page}}">{{page}}</a> &raquo; edit</p>
+
+			<p><a class="back" href="{{appPath}}/main/{{page}}">back to page:{{page}}</a></p>
+
+			<div class="clearer">&nbsp;</div>
+		</div>
+
+		<div id="container">
+			<form method="POST" action="{{appPath}}/main/{{page}}" enctype="multipart/form-data" id="edit_form">
+				<textarea name="data" cols="80" rows="20">{{data}}</textarea><br />
+				<p>
+					<input type="submit" value="save changes">
+					<a class="back" href="{{appPath}}/main/{{page}}">back to page:{{page}}</a>
+				</p>
+			</form>
+		</div>
+
+		<div id="footer">
+			<p>&copy; 2009 Masashi Iizuka</p>
+		</div>
+	</div>
 </body>
- 
 </html>
 

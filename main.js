@@ -2,7 +2,7 @@ var taskpaper = {};
 // =constant {{{
 taskpaper.constant = {
 	DEFAULT_PAGE: "index",
-	DEFAULT_CONTENT: "group:\n- sample\n- done task #done\n\ngroup2;\n-neko\n-inu #dog",
+	DEFAULT_CONTENT: "group:\n- sample\n- done task #done\n- new page [[page2]]\n\ngroup2;\n-neko\n-inu #dog",
 	TYPE_TASK: 0,
 	TYPE_GROUP: 1,
 	TYPE_TEXT: 2,
